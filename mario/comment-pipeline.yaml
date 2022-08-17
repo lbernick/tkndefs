@@ -1,0 +1,119 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: mario-comment-github
+  labels:
+    created-by: lbernick
+spec:
+  params:
+  - name: pullRequestID
+  - name: buildUUID
+  - name: gitURL
+  - name: targetImage
+  - name: passedOrFailed
+  workspaces:
+  - name: pr
+  tasks:
+  - name: download-pr-info
+    taskRef:
+      name: pull-request
+      bundle: gcr.io/tekton-releases/catalog/upstream/pull-request:0.1
+    workspaces:
+    - name: pr
+      workspace: pr
+    params:
+    - name: mode
+      value: download
+    - name: url
+      value: $(params.gitURL)/pull/$(params.pullRequestID)
+    - name: provider
+      value: github
+    - name: secret-key-ref
+      value: mario-github-token
+  - name: setup-comment
+    runAfter:
+    - download-pr-info
+    params:
+    - name: passedOrFailed
+      value: $(params.passedOrFailed)
+    - name: targetImage
+      value: $(params.targetImage)
+    - name: buildUUID
+      value: $(params.buildUUID)
+    workspaces:
+    - name: pr
+      workspace: pr
+    taskSpec:
+      params:
+      - name: passedOrFailed
+      - name: targetImage
+      - name: buildUUID
+      workspaces:
+      - name: pr
+      steps:
+      - name: setup-comment
+        image: python:3-alpine
+        script: |
+          #!/usr/bin/env python
+          import json
+          import random
+          
+          marios_pics_root = 'https://storage.googleapis.com/mario-bot/pics'
+          ok_pics = ['mario', 'luigi', 'tekton']
+          failed_pics = ['goomba']
+          logs_url = 'http://35.222.249.224/?buildid=%s&namespace=mario'
+          successful = ("$(params.passedOrFailed)" == "True")
+          print("PassedOrFailed: {}".format("$(params.passedOrFailed)"))
+          
+          # Service Image
+          comment_template = (
+          '<img width="200" alt="{pic_alt}" src="{pic_src}">'
+          ' at your service! </p>'
+          )
+          
+          if successful:
+            chosen_pic = random.choice(ok_pics)
+          else:
+            chosen_pic = random.choice(failed_pics)
+          pic_url = "/".join([marios_pics_root, chosen_pic]) + '.png'
+          comment_params = dict(pic_alt=chosen_pic, pic_src=pic_url)
+            
+          if successful:
+            comment_template += (
+            'Here is the image you requested: '
+            '<a href="https://{imageurl}">built image</a>|'
+            )
+            comment_params['imageurl'] = '$(params.targetImage)'
+          else:
+            comment_template += (
+            'Could not build the requested image. Please check the '
+            )
+            
+          comment_template += (
+            '<a href="http://35.222.249.224/?buildid={buildid}&'
+            'namespace=mario">build logs</a>'
+          )
+          comment_params['buildid'] = '$(params.buildUUID)'
+            
+          new_comment_path = "$(workspaces.pr.path)/comments/new.json"
+          comment_body = dict(body=comment_template.format(**comment_params))
+          with open(new_comment_path, "w") as comment:
+            json.dump(comment_body, comment)
+  - name: publish-comment
+    runAfter:
+    - setup-comment
+    taskRef:
+      name: pull-request
+      bundle: gcr.io/tekton-releases/catalog/upstream/pull-request:0.1
+    params:
+    - name: mode
+      value: upload
+    - name: url
+      value: $(params.gitURL)/pull/$(params.pullRequestID)
+    - name: provider
+      value: github
+    - name: secret-key-ref
+      value: mario-github-token
+    workspaces:
+    - name: pr
+      workspace: pr

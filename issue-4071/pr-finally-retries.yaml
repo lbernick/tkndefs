@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: please-say-bye
+  labels:
+    created-by: lbernick
+spec:
+  tasks:
+    - name: hi
+      taskSpec:
+        steps:
+          - name: hi
+            image: alpine:3.12
+            script: |
+              echo 'hi'
+  finally:
+    - name: bye
+      retries: 4
+      taskSpec:
+        steps:
+          - name: bye
+            image: alpine:3.12
+            script: |
+              echo 'bye'
+              sleep 3
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: please-say-bye-pr
+  labels:
+    created-by: lbernick
+spec:
+  timeouts:
+    finally: 5s
+  pipelineRef:
+    name: please-say-bye

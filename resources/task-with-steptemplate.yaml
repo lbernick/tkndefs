@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: image-build-task
+spec:
+  steps:
+    - name: build
+      image: alpine
+      resources:
+        requests:
+          memory: 500Mi
+  stepTemplate:
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 0.5
+      limits:
+        memory: 400Mi

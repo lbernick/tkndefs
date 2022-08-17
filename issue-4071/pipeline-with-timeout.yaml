@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: please-say-hi
+  labels:
+    created-by: lbernick
+spec:
+  tasks:
+    - name: hi
+      taskSpec:
+        steps:
+          - name: hi
+            image: alpine:3.12
+            script: |
+              echo 'hi'
+              sleep 10
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: please-say-hi-pr
+  labels:
+    created-by: lbernick
+spec:
+  timeouts:
+    pipeline: 8s
+  pipelineRef:
+    name: please-say-hi

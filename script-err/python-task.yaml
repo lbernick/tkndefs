@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: script-err-task
+spec:
+  steps:
+    - name: echo
+      image: python
+      script: |
+        #!/usr/bin/env python3
+        print("hello from python"

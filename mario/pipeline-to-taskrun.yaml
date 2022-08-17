@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Run
+metadata:
+  name: mario-comment-github-run
+  labels:
+    created-by: lbernick
+spec:
+  ref:
+    apiVersion: tekton.dev/v1alpha1
+    kind: PipelineToTaskRun
+    name: mario-comment-github
+  serviceAccountName: mario-listener
+  workspaces:
+  - name: pr
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Mi
+  params:
+  - name: pullRequestID
+    value: "935"
+  - name: gitURL
+    value: https://github.com/tektoncd/plumbing
+  - name: targetImage
+    value: https://gcr.io/tekton-releases/dogfooding/tkn:mario
+  - name: passedOrFailed
+    value: Succeeded
+  - name: buildPipelineRun
+    value: foo

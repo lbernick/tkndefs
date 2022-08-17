@@ -1,0 +1,64 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-and-build-lb-exp
+  labels:
+    created-by: lbernick
+spec:
+  params:
+  - name: gitRepository
+  - name: gitRevision
+  - name: gitCloneDepth
+    default: "10"
+  - name: targetImage
+  - name: contextPath
+  - name: pullRequestID
+  workspaces:
+  - name: source-code
+  - name: gcp-secret
+  tasks:
+  - name: clone
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://$(params.gitRepository)
+    - name: revision
+      value: $(params.gitRevision)
+    - name: depth
+      value: $(params.gitCloneDepth)
+    workspaces:
+    - name: output
+      workspace: source-code
+  - name: build
+    runAfter:
+      - clone
+    params:
+    - name: contextPath
+      value: $(params.contextPath)
+    - name: targetImage
+      value: $(params.targetImage)
+    workspaces:
+    - name: source-code
+      workspace: source-code
+    - name: gcp-secret
+      workspace: gcp-secret
+    taskSpec:
+      params:
+      - name: contextPath
+      - name: targetImage
+      workspaces:
+      - name: source-code
+      - name: gcp-secret
+      steps:
+      - name: build-and-push
+        workingdir: $(workspaces.source-code.path)
+        image: gcr.io/kaniko-project/executor:v0.13.0
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: $(workspaces.gcp-secret.path)/release.json
+        command:
+        - /kaniko/executor
+        - --dockerfile=Dockerfile
+        - --context=$(params.contextPath)
+        - --destination=$(params.targetImage)

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limitrange-example
+spec:
+  limits:
+  - default:  # The default limits
+      cpu: 2
+    defaultRequest:  # The default requests
+      cpu: 1
+    max:  # The maximum limits
+      cpu: 3
+    min:  # The minimum requests
+      cpu: 700m
+    type: Container

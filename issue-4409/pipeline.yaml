@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: test-finally
+spec:
+  tasks:
+  - name: test1
+    taskRef:
+      name: noop
+    params:
+      - name: RETURN_CODE
+        value: "1"
+      - name: SLEEP_SEC
+        value: "1"
+    retries: 5
+  - name: test2
+    taskRef:
+      name: noop
+    params:
+      - name: RETURN_CODE
+        value: "1"
+      - name: SLEEP_SEC
+        value: "2"
+    # retries: 2
+  finally:
+    - name: cleanup
+      taskRef:
+        name: noop

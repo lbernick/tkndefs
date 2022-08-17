@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: resource-example
+spec:
+  description: Sample Task to show issues with passing parameters to resources.
+  params:
+    - name: RESOURCE_MEMORY_REQUEST
+      type: string
+      default: "100Mi"
+  steps:
+    - name: noop
+      image: alpine
+      resources:
+        requests:
+          memory: "$(params.RESOURCE_MEMORY_REQUEST)"

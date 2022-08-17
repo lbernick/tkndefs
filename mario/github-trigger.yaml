@@ -1,0 +1,49 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: mario-comment-github-lb-exp
+  labels:
+    created-by: lbernick
+spec:
+  params:
+  - name: pullRequestID
+    description: The pullRequestID to comment to
+  - name: gitURL
+    description: The URL of the git repo
+  - name: targetImage
+    description: The fully qualified image target e.g. repo/name:tag
+  - name: passedOrFailed
+    description: Whether the triggering event was successful or not
+  - name: buildPipelineRun
+    description: The name of the image build PipelineRun for the logs link
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: Run
+    metadata:
+      generateName: mario-comment-github-
+    spec:
+      ref:
+        apiVersion: tekton.dev/v1alpha1
+        kind: PipelineToTaskRun
+        name: mario-comment-github
+      serviceAccountName: mario-listener
+      workspaces:
+      - name: pr
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Mi
+      params:
+      - name: pullRequestID
+        value: $(tt.params.pullRequestID)
+      - name: gitURL
+        value: $(tt.params.gitURL)
+      - name: targetImage
+        value: $(tt.params.targetImage)
+      - name: passedOrFailed
+        value: $(tt.params.passedOrFailed)
+      - name: buildPipelineRun
+        value: $(tt.params.buildPipelineRun)

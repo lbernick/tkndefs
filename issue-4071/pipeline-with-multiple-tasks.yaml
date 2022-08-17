@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+ name: say-hi-multiple-task
+spec:
+ timeouts:
+   pipeline: 1m
+   tasks: 30s
+ pipelineSpec:
+   tasks:
+     - name: hi
+       retries: 2
+       taskSpec:
+         steps:
+           - name: hi
+             image: alpine:3.12
+             script: |
+               echo 'hi'
+               sleep 10
+     - name: bye
+       taskSpec:
+         steps:
+         - name: bye
+           image: alpine:3.12
+           script: |
+             echo "bye"
+             sleep 5 
+       runAfter:
+         - hi

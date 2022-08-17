@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-failure
+  labels:
+    type: test
+spec:
+  pipelineSpec:
+    tasks:
+    - name: fail
+      taskSpec:
+        steps:
+        - image: bash
+          name: no-fail
+          script: |
+            exit 1
+    - name: no-fail
+      runAfter:
+        - fail
+      taskSpec:
+        steps:
+        - image: bash
+          name: no-fail
+          script: |
+            exit 0

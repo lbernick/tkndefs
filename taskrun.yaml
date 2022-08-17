@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: "lees-taskrun"
+spec:
+  taskRef:
+    name: git-clone
+    bundle: gcr.io/tekton-releases/catalog/upstream/git-clone:0.6
+  params:
+  - name: url
+    value: https://github.com/tektoncd/pipeline
+  workspaces:
+  - name: output
+    emptyDir: {}

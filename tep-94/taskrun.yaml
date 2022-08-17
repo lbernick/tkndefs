@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: echo-good-morning-run
+spec:
+  taskRef:
+    name: echo-good-morning
+  stepOverrides:
+  - name: echo
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 100m

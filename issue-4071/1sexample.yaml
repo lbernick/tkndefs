@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: "foo"
+spec:
+  timeouts:
+    tasks: 5s
+  pipelineSpec:
+    tasks:
+    - name: hi
+      taskSpec:
+        steps:
+        - name: hi
+          image: alpine:3.12
+          script: |
+            echo 'hi'
+            sleep 7
+    - name: bye
+      taskSpec:
+        steps:
+        - name: bye
+          image: alpine:3.12
+          script: | 
+            echo "bye"
+            sleep 7 
+      runAfter:
+      - hi

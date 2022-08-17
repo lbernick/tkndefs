@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: noop
+spec:
+  params:
+  - name: RETURN_CODE
+    default: "0"
+  - name: SLEEP_SEC
+    default: "2"
+  steps:
+    - name: sleep
+      image: registry.access.redhat.com/ubi8/ubi-minimal
+      script: |
+        #!/usr/bin/env bash
+        set -e
+
+        echo "Will sleep for $(params.SLEEP_SEC) seconds"
+        sleep $(params.SLEEP_SEC)
+
+        if [[ $(params.RETURN_CODE) != "0" ]]; then
+          echo "Failure"
+        else
+          echo "Success"
+        fi
+
+        exit $(params.RETURN_CODE)

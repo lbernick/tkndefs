@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: echo-run
+spec:
+  pipelineRef:
+    name: echo-good-morning-pipeline
+  taskRunSpecs:
+  - pipelineTaskName: echo
+    stepOverrides:
+    - name: echo
+      resources:
+        requests:
+          memory: 400Mi
+          cpu: 200m

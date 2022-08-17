@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: echo-good-morning
+spec:
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        echo "Good Morning!"
+      readinessProbe:
+        exec:
+          command:
+          - cat
+          - /tmp/healthy

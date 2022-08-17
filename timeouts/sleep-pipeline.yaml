@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: good-morning-good-afternoon
+spec:
+  tasks:
+    - name: echo-good-morning
+      taskSpec:
+        steps:
+          - name: echo
+            image: ubuntu
+            script: |
+              #!/usr/bin/env bash
+              echo "Good Morning!"
+              sleep inf
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: good-morning-good-afternoon-run
+spec:
+  pipelineRef:
+    name: good-morning-good-afternoon
+  timeouts:
+    tasks: "0"
+    pipeline: "1m"
