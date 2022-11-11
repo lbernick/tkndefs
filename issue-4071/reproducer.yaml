@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: please-say-bye
+  name: please-say-bye-again
 spec:
   tasks:
     - name: hi
@@ -13,6 +13,7 @@ spec:
             script: |
               echo 'hi'
               sleep 10
+              exit 1
   finally:
     - name: bye
       taskSpec:
@@ -25,11 +26,10 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: please-say-bye-
+  generateName: please-say-bye-again-
 spec:
   timeouts:
-    pipeline: 10s
-    tasks: 5s
-    finally: 5s
+    pipeline: 1m
+    tasks: 19s
   pipelineRef:
-    name: please-say-bye
+    name: please-say-bye-again

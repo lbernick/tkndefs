@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Run
+metadata:
+  generateName: inconsistent-testloop-run-
+spec:
+  params:
+    - name: test-type
+      value:
+        - codeanalysis
+        - unittests
+        - e2etests
+  retries: 5
+  spec:
+    apiVersion: custom.tekton.dev/v1alpha1
+    kind: TaskLoop
+    spec:
+      taskRef:
+        name: my-task
+      iterateParam: test-type
+      retries: 2

@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Run
+metadata:
+  generateName: testloop-run-
+spec:
+  params:
+    - name: test-type
+      value:
+        - codeanalysis
+        - unittests
+        - e2etests
+  ref:
+    apiVersion: custom.tekton.dev/v1alpha1
+    kind: TaskLoop
+    name: testloop

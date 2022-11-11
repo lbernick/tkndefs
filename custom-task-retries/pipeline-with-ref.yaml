@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: ci-pipeline-ref
+spec:
+  pipelineSpec:
+    tasks:
+    - name: loop-task
+      params:
+        - name: test-type
+          value:
+            - codeanalysis
+            - unittests
+            - e2etests
+      retries: 5
+      taskRef:
+        apiVersion: custom.tekton.dev/v1alpha1
+        kind: TaskLoop
+        name: testloop

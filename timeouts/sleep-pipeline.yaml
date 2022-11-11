@@ -22,5 +22,6 @@ spec:
   pipelineRef:
     name: good-morning-good-afternoon
   timeouts:
-    tasks: "0"
-    pipeline: "1m"
+    tasks: "1m"
+    pipeline: "0"
+
