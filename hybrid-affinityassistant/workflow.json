@@ -1,0 +1,110 @@
+{
+    "options": {
+      "execution_environment": {
+        "worker_pool": "projects/cloud-aoss-dev/locations/us-central1/workerPools/gcb-workflow"
+      }
+    },
+    "workspaces": [
+          {
+              "name": "shared-workspace",
+              "volume_claim_template": {
+                  "spec": {
+                      "resources": {
+                          "requests" :{ 
+                              "storage": "10G"
+                          }
+                      },
+                      "access_modes": ["READ_WRITE_ONCE"]
+                  }
+              }
+          }
+      ],
+    "pipeline_spec": {
+      "workspaces": [
+          {
+              "name": "shared-workspace"
+          }
+      ],
+      "tasks": [
+   
+          {
+              "name": "fetch-source",
+              "task_ref": {
+                  "name": "git-clone",
+                  "bundle": "gcr.io/tekton-releases/catalog/upstream/git-clone:0.3@sha256:8e2c3fb0f719d6463e950f3e44965aa314e69b800833e29e68ba2616bb82deeb"
+              },
+              "params": [
+                  {
+                      "name": "url",
+                      "value": {
+                          "type": "string",
+                          "string_val": "https://github.com/apache/commons-codec"
+                      }
+                  },
+                  {
+                      "name": "revision",
+                      "value": {
+                          "type": "string",
+                          "string_val": "rel/commons-codec-1.15"
+                      }
+                  }
+              ],
+              "workspaces": [
+                  {
+                      "name": "output",
+                      "workspace": "shared-workspace"
+                  }
+              ]   
+          },
+          {
+              "name": "build-package",
+              "run_after": ["fetch-source"],
+              "workspaces": [
+                  {
+                      "name": "shared-workspace"
+                  }
+              ],
+              "task_spec": {
+                  "task_spec": {
+                      "workspaces": [
+                          {
+                              "name": "shared-workspace"
+                          }
+                      ],
+                      "results": [
+                        {
+                          "name": "commons-codec_ARTIFACT_DIGEST"
+                        },
+                        {
+                          "name": "commons-codec_ARTIFACT_URI"
+                        } 
+                      ],
+                      "steps": [
+                          {
+                              "name": "clone-aoss-repo",
+                              "image": "gcr.io/google.com/cloudsdktool/google-cloud-cli:latest",
+                              "script": "cd workspace/shared-workspace &&  gcloud source repos clone aoss-builds --project=cloud-aoss-dev"
+   
+                          },
+                          {
+                              "name": "build-package",
+                              "image": "maven:3-jdk-11",
+                              "script": "cd workspace/shared-workspace/aoss-builds\ngit checkout main\ncd ..\nmv ./aoss-builds/secure_builds/java_builds/maven-toolchains.xml .\nmvn install  -Drat.skip=true -Dmaven.main.skip=true -Dmaven.test.skip=true --no-transfer-progress --global-toolchains=./maven-toolchains.xml\n"
+                          },
+                          {
+                              "name": "upload-package",
+                              "image": "maven:3-jdk-11",
+                              "script": "cd workspace/shared-workspace\nmv ./aoss-builds/secure_builds/java_builds/commons-codec/pom-deploy.xml ./\nmvn deploy -f ./pom-deploy.xml -Drat.skip=true -Dmaven.main.skip=true -Dmaven.test.skip=true -Dar.url=artifactregistry://us-central1-maven.pkg.dev/cloud-aoss-dev/javatestrepo -Dpackaging=java-source -DgeneratePom=false"
+                          },
+                          {
+                              "name": "output-results",
+                              "image": "maven:3-jdk-11",
+                              "script": "echo \"artifactregistry://us-central1-maven.pkg.dev/cloud-aoss-dev/javatestrepo\"| tee $(results.commons-codec_ARTIFACT_URI.path) && echo dMSiS7GKRDgL5f0n | tee $(results.commons-codec_ARTIFACT_DIGEST.path)"
+                          }
+                      ]
+                  }
+              }
+          }
+      ]
+    }
+  }
