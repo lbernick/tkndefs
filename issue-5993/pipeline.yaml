@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-world
+  namespace: issue-5993
+spec:
+  steps:
+  - image: busybox
+    script: "echo hello world"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: sleep
+  namespace: issue-5993
+spec:
+  steps:
+  - image: busybox
+    script: "sleep 100000"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: test-pipeline
+  namespace: issue-5993
+spec:
+  finally:
+  - name: final-task-1
+    taskRef:
+      name: sleep
+  tasks:
+  - name: hello-world-1
+    taskRef:
+      name: hello-world
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-pipelinerun
+  namespace: issue-5993
+spec:
+  pipelineRef:
+    name: test-pipeline
