@@ -1,0 +1,14 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: foo
+spec:
+  params:
+  - name: cpu
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    spec:
+      computeResources:
+        requests:
+           cpu: $(tt.params.cpu)
