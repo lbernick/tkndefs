@@ -1,0 +1,21 @@
+---
+global:
+  measurements:
+    - name: podLatency
+      thresholds:
+      - conditionType: Ready
+        metric: Avg
+        threshold: 4s
+
+jobs:
+  - name: kubelet-density
+    jobIterations: 10
+    qps: 20
+    burst: 20
+    namespacedIterations: false
+    namespace: kubelet-density
+    waitWhenFinished: true
+    podWait: true
+    objects:
+      - objectTemplate: pipelinerun.yaml
+        replicas: 1
