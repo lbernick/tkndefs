@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: timeout2
+spec:
+  timeouts:
+    tasks: 2h
+  pipelineSpec:
+    tasks:
+    - name: task1
+      taskSpec:
+        steps:
+        - image: busybox
+          script: |
+            echo "hello"
+            sleep 1200
+            echo "goodbye"
