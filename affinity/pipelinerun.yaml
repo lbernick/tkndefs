@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: good-morning-run-
+spec:
+  workspaces:
+  - name: source
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Mi
+  pipelineSpec:
+    workspaces:
+    - name: source
+    tasks:
+    - name: first
+      taskSpec:
+        workspaces:
+        - name: source
+        steps:
+        - image: busybox
+          script: |
+            echo $(workspaces.source.path)
+            sleep 60
+      workspaces:
+      - name: source
+    - name: last
+      taskSpec:
+        workspaces:
+        - name: source
+        steps:
+        - image: busybox
+          script: |
+            echo $(workspaces.source.path)
+            sleep 60
+      runAfter: ["first"]
+      workspaces:
+      - name: source
