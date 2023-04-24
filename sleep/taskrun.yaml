@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  generateName: sleep-
+spec:
+  taskSpec:
+    steps:
+    - name: echo
+      image: ubuntu
+      script: |
+        #!/usr/bin/env bash
+        echo "Good Morning!"
+        sleep 500
