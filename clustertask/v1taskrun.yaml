@@ -1,0 +1,8 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: v1-taskrun
+spec:
+  taskRef:
+    name: my-cluster-task
+    kind: ClusterTask
