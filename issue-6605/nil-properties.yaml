@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nil-properties
+spec:
+  results:
+    - name: object-results
+      type: object
+  steps:
+  - image: bash
+    script: |
+      echo -n "{\"IMAGE_URL\":\"ar.com\", \"IMAGE_DIGEST\":\"sha234\"}" > $(results.object-results.path)

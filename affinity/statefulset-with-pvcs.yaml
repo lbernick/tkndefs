@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: with-volumeclaimtemplates
+spec:
+  replicas: 1
+  serviceName: ""
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: affinity-assistant
+      app.kubernetes.io/instance: affinity-assistant-12345
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: affinity-assistant
+        app.kubernetes.io/instance: affinity-assistant-12345
+    spec:
+      containers:
+      - args:
+        - tekton_run_indefinitely
+        image: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+        imagePullPolicy: IfNotPresent
+        name: affinity-assistant
+        resources:
+          limits:
+            cpu: 50m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+  volumeClaimTemplates:
+  - metadata:
+      name: first-volume
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Mi
+  - metadata:
+      name: second-volume
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Mi

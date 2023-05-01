@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-467fbbfb6c
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+# ---
+# What gets generated:
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   annotations:
+#     kubectl.kubernetes.io/last-applied-configuration: |
+#       {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pvc-467fbbfb6c","namespace":"default"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}}}}
+#     pv.kubernetes.io/bind-completed: "yes"
+#     pv.kubernetes.io/bound-by-controller: "yes"
+#     volume.beta.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#     volume.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#   creationTimestamp: "2023-05-01T20:34:17Z"
+#   finalizers:
+#   - kubernetes.io/pvc-protection
+#   name: pvc-467fbbfb6c
+#   namespace: default
+#   resourceVersion: "568788939"
+#   uid: 60703953-a4c5-4f78-be35-d2238c1c2f4e
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   storageClassName: standard
+#   volumeMode: Filesystem
+#   volumeName: pvc-60703953-a4c5-4f78-be35-d2238c1c2f4e
+# status:
+#   accessModes:
+#   - ReadWriteOnce
+#   capacity:
+#     storage: 1Gi
+#   phase: Bound
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: with-pod-volumes
+spec:
+  replicas: 1
+  serviceName: ""
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: affinity-assistant
+      app.kubernetes.io/instance: affinity-assistant-5e4c6a2ad7
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: affinity-assistant
+        app.kubernetes.io/instance: affinity-assistant-5e4c6a2ad7
+    spec:
+      containers:
+      - args:
+        - tekton_run_indefinitely
+        image: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+        imagePullPolicy: IfNotPresent
+        name: affinity-assistant
+        resources:
+          limits:
+            cpu: 50m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: pvc-467fbbfb6c
+# ---
+### What gets generated
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   annotations:
+#     kubectl.kubernetes.io/last-applied-configuration: |
+#       {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"with-pod-volumes","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"affinity-assistant","app.kubernetes.io/instance":"affinity-assistant-5e4c6a2ad7"}},"serviceName":"","template":{"metadata":{"labels":{"app.kubernetes.io/component":"affinity-assistant","app.kubernetes.io/instance":"affinity-assistant-5e4c6a2ad7"}},"spec":{"containers":[{"args":["tekton_run_indefinitely"],"image":"gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819","imagePullPolicy":"IfNotPresent","name":"affinity-assistant","resources":{"limits":{"cpu":"50m","memory":"100Mi"},"requests":{"cpu":"50m","memory":"100Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"volumes":[{"name":"workspace","persistentVolumeClaim":{"claimName":"pvc-467fbbfb6c"}}]}}}}
+#   creationTimestamp: "2023-05-01T20:31:29Z"
+#   generation: 1
+#   name: with-pod-volumes
+#   namespace: default
+#   resourceVersion: "568789151"
+#   uid: 960b8604-fee1-4960-9fdf-cdd4a68ec735
+# spec:
+#   podManagementPolicy: OrderedReady
+#   replicas: 1
+#   revisionHistoryLimit: 10
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/component: affinity-assistant
+#       app.kubernetes.io/instance: affinity-assistant-5e4c6a2ad7
+#   serviceName: ""
+#   template:
+#     metadata:
+#       creationTimestamp: null
+#       labels:
+#         app.kubernetes.io/component: affinity-assistant
+#         app.kubernetes.io/instance: affinity-assistant-5e4c6a2ad7
+#     spec:
+#       containers:
+#       - args:
+#         - tekton_run_indefinitely
+#         image: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+#         imagePullPolicy: IfNotPresent
+#         name: affinity-assistant
+#         resources:
+#           limits:
+#             cpu: 50m
+#             memory: 100Mi
+#           requests:
+#             cpu: 50m
+#             memory: 100Mi
+#         terminationMessagePath: /dev/termination-log
+#         terminationMessagePolicy: File
+#       dnsPolicy: ClusterFirst
+#       restartPolicy: Always
+#       schedulerName: default-scheduler
+#       securityContext: {}
+#       terminationGracePeriodSeconds: 30
+#       volumes:
+#       - name: workspace
+#         persistentVolumeClaim:
+#           claimName: pvc-467fbbfb6c
+#   updateStrategy:
+#     rollingUpdate:
+#       partition: 0
+#     type: RollingUpdate
+# status:
+#   availableReplicas: 1
+#   collisionCount: 0
+#   currentReplicas: 1
+#   currentRevision: with-pod-volumes-757747f866
+#   observedGeneration: 1
+#   readyReplicas: 1
+#   replicas: 1
+#   updateRevision: with-pod-volumes-757747f866
+#   updatedReplicas: 1
