@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: v1-task
+  namespace: foo
+spec:
+  steps:
+    - name: echo
+      image: busybox
+      script: |
+        echo "Good Morning!"
+  
