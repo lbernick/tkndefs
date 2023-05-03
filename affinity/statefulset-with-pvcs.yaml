@@ -47,3 +47,388 @@ spec:
       resources:
         requests:
           storage: 10Mi
+# ---
+# What gets generated
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   creationTimestamp: "2023-05-01T20:38:58Z"
+#   generation: 1
+#   name: with-volumeclaimtemplates
+#   namespace: default
+#   resourceVersion: "568792586"
+#   uid: 13979366-7efc-462c-b605-d086618d1be7
+# spec:
+#   podManagementPolicy: OrderedReady
+#   replicas: 1
+#   revisionHistoryLimit: 10
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/component: affinity-assistant
+#       app.kubernetes.io/instance: affinity-assistant-12345
+#   serviceName: ""
+#   template:
+#     metadata:
+#       creationTimestamp: null
+#       labels:
+#         app.kubernetes.io/component: affinity-assistant
+#         app.kubernetes.io/instance: affinity-assistant-12345
+#     spec:
+#       containers:
+#       - args:
+#         - tekton_run_indefinitely
+#         image: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+#         imagePullPolicy: IfNotPresent
+#         name: affinity-assistant
+#         resources:
+#           limits:
+#             cpu: 50m
+#             memory: 100Mi
+#           requests:
+#             cpu: 50m
+#             memory: 100Mi
+#         terminationMessagePath: /dev/termination-log
+#         terminationMessagePolicy: File
+#       dnsPolicy: ClusterFirst
+#       restartPolicy: Always
+#       schedulerName: default-scheduler
+#       securityContext: {}
+#       terminationGracePeriodSeconds: 30
+#   updateStrategy:
+#     rollingUpdate:
+#       partition: 0
+#     type: RollingUpdate
+#   volumeClaimTemplates:
+#   - apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     metadata:
+#       creationTimestamp: null
+#       name: first-volume
+#     spec:
+#       accessModes:
+#       - ReadWriteOnce
+#       resources:
+#         requests:
+#           storage: 10Mi
+#       volumeMode: Filesystem
+#     status:
+#       phase: Pending
+#   - apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     metadata:
+#       creationTimestamp: null
+#       name: second-volume
+#     spec:
+#       accessModes:
+#       - ReadWriteOnce
+#       resources:
+#         requests:
+#           storage: 10Mi
+#       volumeMode: Filesystem
+#     status:
+#       phase: Pending
+# status:
+#   availableReplicas: 1
+#   collisionCount: 0
+#   currentReplicas: 1
+#   currentRevision: with-volumeclaimtemplates-686549c658
+#   observedGeneration: 1
+#   readyReplicas: 1
+#   replicas: 1
+#   updateRevision: with-volumeclaimtemplates-686549c658
+#   updatedReplicas: 1
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   annotations:
+#     pv.kubernetes.io/bind-completed: "yes"
+#     pv.kubernetes.io/bound-by-controller: "yes"
+#     volume.beta.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#     volume.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#   creationTimestamp: "2023-05-01T20:38:58Z"
+#   finalizers:
+#   - kubernetes.io/pvc-protection
+#   labels:
+#     app.kubernetes.io/component: affinity-assistant
+#     app.kubernetes.io/instance: affinity-assistant-12345
+#   name: first-volume-with-volumeclaimtemplates-0
+#   namespace: default
+#   resourceVersion: "568792431"
+#   uid: 2e3ba65d-708c-49ed-a931-dcf86389f5ad
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Mi
+#   storageClassName: standard
+#   volumeMode: Filesystem
+#   volumeName: pvc-2e3ba65d-708c-49ed-a931-dcf86389f5ad
+# status:
+#   accessModes:
+#   - ReadWriteOnce
+#   capacity:
+#     storage: 1Gi
+#   phase: Bound
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   annotations:
+#     pv.kubernetes.io/migrated-to: pd.csi.storage.gke.io
+#     pv.kubernetes.io/provisioned-by: kubernetes.io/gce-pd
+#     volume.kubernetes.io/provisioner-deletion-secret-name: ""
+#     volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
+#   creationTimestamp: "2023-05-01T20:39:01Z"
+#   finalizers:
+#   - kubernetes.io/pv-protection
+#   - external-attacher/pd-csi-storage-gke-io
+#   labels:
+#     topology.kubernetes.io/region: us-central1
+#     topology.kubernetes.io/zone: us-central1-f
+#   name: pvc-2e3ba65d-708c-49ed-a931-dcf86389f5ad
+#   resourceVersion: "568792467"
+#   uid: fd83792b-fa87-47f0-8a67-5f99b79bddbe
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   capacity:
+#     storage: 1Gi
+#   claimRef:
+#     apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     name: first-volume-with-volumeclaimtemplates-0
+#     namespace: default
+#     resourceVersion: "568792368"
+#     uid: 2e3ba65d-708c-49ed-a931-dcf86389f5ad
+#   gcePersistentDisk:
+#     fsType: ext4
+#     pdName: pvc-2e3ba65d-708c-49ed-a931-dcf86389f5ad
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: topology.kubernetes.io/zone
+#           operator: In
+#           values:
+#           - us-central1-f
+#         - key: topology.kubernetes.io/region
+#           operator: In
+#           values:
+#           - us-central1
+#   persistentVolumeReclaimPolicy: Delete
+#   storageClassName: standard
+#   volumeMode: Filesystem
+# status:
+#   phase: Bound
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   annotations:
+#     pv.kubernetes.io/bind-completed: "yes"
+#     pv.kubernetes.io/bound-by-controller: "yes"
+#     volume.beta.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#     volume.kubernetes.io/storage-provisioner: pd.csi.storage.gke.io
+#   creationTimestamp: "2023-05-01T20:38:58Z"
+#   finalizers:
+#   - kubernetes.io/pvc-protection
+#   labels:
+#     app.kubernetes.io/component: affinity-assistant
+#     app.kubernetes.io/instance: affinity-assistant-12345
+#   name: second-volume-with-volumeclaimtemplates-0
+#   namespace: default
+#   resourceVersion: "568792426"
+#   uid: a346a757-cb2a-407b-b0f2-6eb523f0701f
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Mi
+#   storageClassName: standard
+#   volumeMode: Filesystem
+#   volumeName: pvc-a346a757-cb2a-407b-b0f2-6eb523f0701f
+# status:
+#   accessModes:
+#   - ReadWriteOnce
+#   capacity:
+#     storage: 1Gi
+#   phase: Bound
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   annotations:
+#     pv.kubernetes.io/migrated-to: pd.csi.storage.gke.io
+#     pv.kubernetes.io/provisioned-by: kubernetes.io/gce-pd
+#     volume.kubernetes.io/provisioner-deletion-secret-name: ""
+#     volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
+#   creationTimestamp: "2023-05-01T20:39:01Z"
+#   finalizers:
+#   - kubernetes.io/pv-protection
+#   - external-attacher/pd-csi-storage-gke-io
+#   labels:
+#     topology.kubernetes.io/region: us-central1
+#     topology.kubernetes.io/zone: us-central1-f
+#   name: pvc-a346a757-cb2a-407b-b0f2-6eb523f0701f
+#   resourceVersion: "568792466"
+#   uid: b218fedb-307b-461e-863b-465556688960
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   capacity:
+#     storage: 1Gi
+#   claimRef:
+#     apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     name: second-volume-with-volumeclaimtemplates-0
+#     namespace: default
+#     resourceVersion: "568792369"
+#     uid: a346a757-cb2a-407b-b0f2-6eb523f0701f
+#   gcePersistentDisk:
+#     fsType: ext4
+#     pdName: pvc-a346a757-cb2a-407b-b0f2-6eb523f0701f
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: topology.kubernetes.io/zone
+#           operator: In
+#           values:
+#           - us-central1-f
+#         - key: topology.kubernetes.io/region
+#           operator: In
+#           values:
+#           - us-central1
+#   persistentVolumeReclaimPolicy: Delete
+#   storageClassName: standard
+#   volumeMode: Filesystem
+# status:
+#   phase: Bound
+# ---
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   creationTimestamp: "2023-05-01T20:38:58Z"
+#   generateName: with-volumeclaimtemplates-
+#   labels:
+#     app.kubernetes.io/component: affinity-assistant
+#     app.kubernetes.io/instance: affinity-assistant-12345
+#     controller-revision-hash: with-volumeclaimtemplates-686549c658
+#     statefulset.kubernetes.io/pod-name: with-volumeclaimtemplates-0
+#   name: with-volumeclaimtemplates-0
+#   namespace: default
+#   ownerReferences:
+#   - apiVersion: apps/v1
+#     blockOwnerDeletion: true
+#     controller: true
+#     kind: StatefulSet
+#     name: with-volumeclaimtemplates
+#     uid: 13979366-7efc-462c-b605-d086618d1be7
+#   resourceVersion: "568792585"
+#   uid: 427390b8-d0e2-4d40-8f3c-0a6cda1cf99b
+# spec:
+#   containers:
+#   - args:
+#     - tekton_run_indefinitely
+#     image: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+#     imagePullPolicy: IfNotPresent
+#     name: affinity-assistant
+#     resources:
+#       limits:
+#         cpu: 50m
+#         memory: 100Mi
+#       requests:
+#         cpu: 50m
+#         memory: 100Mi
+#     terminationMessagePath: /dev/termination-log
+#     terminationMessagePolicy: File
+#     volumeMounts:
+#     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+#       name: kube-api-access-j7hn2
+#       readOnly: true
+#   dnsPolicy: ClusterFirst
+#   enableServiceLinks: true
+#   hostname: with-volumeclaimtemplates-0
+#   nodeName: gke-test-cluster-default-pool-2b351b27-vrl5
+#   preemptionPolicy: PreemptLowerPriority
+#   priority: 0
+#   restartPolicy: Always
+#   schedulerName: default-scheduler
+#   securityContext: {}
+#   serviceAccount: default
+#   serviceAccountName: default
+#   terminationGracePeriodSeconds: 30
+#   tolerations:
+#   - effect: NoExecute
+#     key: node.kubernetes.io/not-ready
+#     operator: Exists
+#     tolerationSeconds: 300
+#   - effect: NoExecute
+#     key: node.kubernetes.io/unreachable
+#     operator: Exists
+#     tolerationSeconds: 300
+#   volumes:
+#   - name: first-volume
+#     persistentVolumeClaim:
+#       claimName: first-volume-with-volumeclaimtemplates-0
+#   - name: second-volume
+#     persistentVolumeClaim:
+#       claimName: second-volume-with-volumeclaimtemplates-0
+#   - name: kube-api-access-j7hn2
+#     projected:
+#       defaultMode: 420
+#       sources:
+#       - serviceAccountToken:
+#           expirationSeconds: 3607
+#           path: token
+#       - configMap:
+#           items:
+#           - key: ca.crt
+#             path: ca.crt
+#           name: kube-root-ca.crt
+#       - downwardAPI:
+#           items:
+#           - fieldRef:
+#               apiVersion: v1
+#               fieldPath: metadata.namespace
+#             path: namespace
+# status:
+#   conditions:
+#   - lastProbeTime: null
+#     lastTransitionTime: "2023-05-01T20:39:03Z"
+#     status: "True"
+#     type: Initialized
+#   - lastProbeTime: null
+#     lastTransitionTime: "2023-05-01T20:39:12Z"
+#     status: "True"
+#     type: Ready
+#   - lastProbeTime: null
+#     lastTransitionTime: "2023-05-01T20:39:12Z"
+#     status: "True"
+#     type: ContainersReady
+#   - lastProbeTime: null
+#     lastTransitionTime: "2023-05-01T20:39:03Z"
+#     status: "True"
+#     type: PodScheduled
+#   containerStatuses:
+#   - containerID: containerd://fff4e5e4bc6fbf68eee2adec53b4f08343bd98602b51159e0fe05e63fc49816f
+#     image: sha256:fb610dc3252049dda6cd54ac0fe175347a470ae72fb43a4ca536291ae6bb7e13
+#     imageID: gcr.io/leebernick-test/nop-8eac7c133edad5df719dc37b36b62482@sha256:fa880d120209197317df035a001068b7c91fa53841749c2464887d94caeeb819
+#     lastState: {}
+#     name: affinity-assistant
+#     ready: true
+#     restartCount: 0
+#     started: true
+#     state:
+#       running:
+#         startedAt: "2023-05-01T20:39:12Z"
+#   hostIP: 10.128.0.10
+#   phase: Running
+#   podIP: 10.28.3.37
+#   podIPs:
+#   - ip: 10.28.3.37
+#   qosClass: Guaranteed
+#   startTime: "2023-05-01T20:39:03Z"
