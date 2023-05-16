@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: invalid-with-inline-spec
+spec:
+  pipelineSpec:
+    tasks:
+    - name: foo
+      taskSpec:
+        steps:
+        - image: busybox
+          script: echo $(params.abcd)

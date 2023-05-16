@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: invalid-referenced
+spec:
+  tasks:
+  - name: foo
+    taskSpec:
+      steps:
+      - image: busybox
+        script: echo $(params.abcd)
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: invalid-with-referenced-spec
+spec:
+  params:
+  - name: abcd
+    value: efgh
+  pipelineRef:
+    name: invalid-referenced

@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: invalid-with-referenced-spec
+spec:
+  params:
+  - name: abcd
+    value: efgh
+  pipelineRef:
+    resolver: git
+    params:
+    - name: url
+      value: https://github.com/lbernick/tkndefs.git
+    - name: revision
+      value: main
+    - name: pathInRepo
+      value: propagation/invalid-pipeline.yaml
