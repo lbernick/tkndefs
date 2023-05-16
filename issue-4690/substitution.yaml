@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: some-task
+spec:
+  params:
+    - name: input
+  steps:
+    - name: print
+      image: alpine
+      script: |
+        echo $(params.input)
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: some-task-run-2
+spec:
+  taskRef:
+    name: some-task
+  serviceAccountName: tekton-triggers-admin
+  params:
+    - name: input
+      value: '{"key": "$(params.a)"}'
