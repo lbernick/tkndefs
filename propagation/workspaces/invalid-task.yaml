@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: references-workspaces-dont-exist
+spec:
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        echo $(workspaces.abcd.path)
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: references-workspaces-dont-exist
+spec:
+  taskRef:
+    name: references-workspaces-dont-exist
