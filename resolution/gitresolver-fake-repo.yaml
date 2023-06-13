@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: git-resolver-cant-resolve
+spec:
+  pipelineSpec:
+    tasks:
+    - name: first
+      taskSpec:
+        steps:
+        - image: busybox
+          script: sleep 30
+    - name: resolve
+      taskRef:
+        resolver: git
+        params:
+        - name: url
+          value: https://example.com/foo/bar.git
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: abcd
+      runAfter:
+      - first

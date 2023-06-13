@@ -1,0 +1,20 @@
+kind: Pipeline
+apiVersion: tekton.dev/v1
+metadata:
+  name: write-array-results
+spec:
+  results:
+    - name: array-results
+      type: array
+      value: $(tasks.write-array.results.array-results[*])
+  tasks:
+  - name: write-array
+    taskSpec:
+      results:
+      - name: array-results
+        type: array
+      steps:
+      - image: bash:latest
+        script: |
+          #!/usr/bin/env bash
+          echo -n "[\"hello\",\"world\"]" | tee $(results.array-results.path)

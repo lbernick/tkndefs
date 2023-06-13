@@ -1,0 +1,96 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: gubernator-stop-lee-test
+  namespace: tekton-ci
+spec:
+  description: |-
+    This task can be executed when a Tekton CI job is finished, and it produces the stop metadata required by Gubernator, see https://github.com/kubernetes/test-infra/tree/master/gubernator#job-artifact-gcs-layout
+    Folder structure: . └── pr-logs
+
+      └── pull
+          └── org_repo                     # jobs testing PRs for org/repo live here
+              └── pull_number              # jobs running for a PR with pull_number live here
+                  └── job_name             # all builds for the job for this pr live here
+                      └── build_number     # contains job artifacts, as above
+
+    Build number folder content: . ├── build-log.txt     # std{out,err} from the build └── finished.json     # metadata uploaded once the build finishes
+  params:
+  - description: The GitHub org/repo
+    name: package
+    type: string
+  - description: Name of the CI job
+    name: jobName
+    type: string
+  - description: The name (or number) of the job execution
+    name: jobRunName
+    type: string
+  - description: The prow-style buildId
+    name: buildId
+    type: string
+  - description: The GitHub pull request number
+    name: pullRequestNumber
+    type: string
+  - description: success if the CI job was successful else failure
+    name: jobStatus
+    type: string
+  - description: The git ref of the top commit in the pull request
+    name: gitRevision
+    type: string
+  stepTemplate:
+    env:
+    - name: PULL_ROOT_PATH
+      value: $(workspaces.shared.path)/pr-logs/pull
+    - name: LATEST_BUILD_LEAF_PATH
+      value: $(params.pullRequestNumber)/$(params.jobName)
+    - name: PACKAGE
+      value: $(params.package)
+    - name: GIT_REVISION
+      value: $(params.gitRevision)
+    - name: JOB_RUN_NAME
+      value: $(params.jobRunName)
+    - name: BUILD_ID
+      value: $(params.buildId)
+    - name: JOB_STATUS
+      value: $(params.jobStatus)
+  steps:
+  - image: gcr.io/tekton-releases/dogfooding/tkn:v20230113-3deba3be3c@sha256:f977259288f8961d5e7ed966584f272431edadfda3bd0a30022ad9416ebde47e
+    name: write-data
+    script: |
+      #!/usr/bin/env sh
+      set -e
+
+      # Create the Pull Request / Build folder (it should already exists)
+      echo "creating folder"
+      BUILD_PATH="${PULL_ROOT_PATH}/${PACKAGE/\//_}/${LATEST_BUILD_LEAF_PATH}/${BUILD_ID}"
+      echo "created"
+      mkdir -p "${BUILD_PATH}" || true
+
+      # Collect the build log - it will still be there unless the PipelineRun
+      # has been cancelled or there is some very aggressive Pod pruning happening
+      # This is specific to the Tekton dogfooding CI (hardcoded namespace)
+      echo "getting build log"
+      tkn pr logs -n tekton-ci "${JOB_RUN_NAME}" > "${BUILD_PATH}/build-log.txt"
+
+      # Create the finished.json file
+      # Use the "time now" to simplify the logic
+      # Build the results from the status to simplify the logic
+      if [ "$JOB_STATUS" == "failure" ]; then
+        echo "failure"
+        JOB_RESULT="FAILURE"
+      else
+        echo "success"
+        JOB_RESULT="SUCCESS"
+      fi
+      cat <<EOF | tee "${BUILD_PATH}/finished.json"
+      {
+        "timestamp": $(date +%s),
+        "passed": "${JOB_STATUS}",
+        "result": "${JOB_RESULT}",
+        "revision": "${GIT_REVISION}"
+      }
+      EOF
+    workingDir: $(workspaces.shared.path)
+  workspaces:
+  - description: Workspace where the data is written
+    name: shared

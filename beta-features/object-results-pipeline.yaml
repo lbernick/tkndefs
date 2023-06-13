@@ -1,0 +1,20 @@
+kind: Pipeline
+apiVersion: tekton.dev/v1
+metadata:
+  name: write-object-results
+spec:
+  results:
+    - name: object-results
+      type: object
+      value: $(tasks.write-object.results.object-results[*])
+  tasks:
+  - name: write-object
+    taskSpec:
+      results:
+      - name: object-results
+        type: object
+      steps:
+      - image: bash:latest
+        script: |
+          #!/usr/bin/env bash
+          echo -n "{\"hello\":\"world\"}" | tee $(results.object-results.path)

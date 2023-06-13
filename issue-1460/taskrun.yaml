@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: lee-test
+  namespace: tekton-ci
+spec:
+  params:
+  - name: package
+    value: tektoncd/pipeline
+  - name: jobName
+    value: pull-tekton-pipeline-go-coverage-df
+  - name: jobRunName
+    value: run-go-coverage-9c25s
+  - name: jobStatus
+    value: success
+  - name: pullRequestNumber
+    value: "6789"
+  - name: gitRevision
+    value: bddfd11c4acb39f2581ebb4435a4b3e893231a8f
+  - name: buildId
+    value: "1666521570555727872"
+  serviceAccountName: tekton-ci-logs
+  taskRef:
+    kind: Task
+    name: gubernator-stop-lee-test
+  timeout: 1h0m0s
+  workspaces:
+  - name: shared
+    persistentVolumeClaim:
+      claimName: pvc-4c47e7be0e
