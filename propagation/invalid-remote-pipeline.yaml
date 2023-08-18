@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: invalid-remote-pipeline
+  generateName: invalid-remote-pipeline-
 spec:
   params:
   - name: abcd

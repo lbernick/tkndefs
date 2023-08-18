@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: echo-variables
+spec:
+  steps:
+  - image: busybox
+    script: echo $PROJECT_ID
+  - image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "echo $RUN_ID"]
+---
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: echo-variables-run
+spec:
+  taskRef:
+    name: echo-variables
+  podTemplate:
+    env:
+    - name: PROJECT_ID
+      value: my-project
+    - name: RUN_ID
+      value: run-1234
